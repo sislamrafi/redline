@@ -10,6 +10,8 @@ Then tell Claude, ChatGPT, Antigravity or any MCP-capable agent *"apply my lates
 the annotated screenshot, a zoomed crop of every mark and exact coordinates. It finds the matching code,
 makes the changes and reports back per mark, and you confirm each one in the app.
 
+![Redline marking up a web page](docs/images/1-mark-up.webp)
+
 ```
 ⌥⇧M / Alt+Shift+M  ──►  freeze-frame of the screen under your cursor
                         draw: Box (R) · Arrow (A) · Pen (P) · Pin (I), add a comment to each mark
@@ -28,7 +30,7 @@ makes the changes and reports back per mark, and you confirm each one in the app
 - [Run the desktop app](#run-the-desktop-app) (macOS · Windows · Linux)
 - [Start automatically at login](#start-automatically-at-login)
 - [Connect the MCP server](#connect-the-mcp-server) (Claude Code · Claude Desktop · ChatGPT · Codex CLI · Antigravity)
-- [Using it](#using-it)
+- [Using it](#using-it) (step-by-step walkthrough with screenshots)
 - [MCP reference](#mcp-reference)
 - [Storage layout](#storage-layout)
 - [Configuration](#configuration)
@@ -338,16 +340,77 @@ Look for "MCP servers" in their settings and point it at `node /absolute/path/to
 
 ## Using it
 
-1. Open the app or page you want to change and press **⌥⇧M / Alt+Shift+M**.
-2. Draw marks and type a comment for each one, for example *"make this button smaller"*. Press **N** to add an overall note.
-3. Save with **⌘↵ / Ctrl+Enter**.
-4. In your agent, inside the project that contains that UI, say:
+This walkthrough follows one real request: making a heading on a web page a little bigger.
 
-   > apply my latest Redline
+### Step 1: Add the Redline MCP to Claude (one-time setup)
 
-   In Claude Code you can also run `/mcp__redline__apply_latest`.
-5. The agent edits the code and sets each mark to **Waiting for confirmation**.
-   Open the history (**⌥⇧H / Alt+Shift+H**), check the result and click **✓ Looks good**, or **↺ Not done** to send it back.
+Your agent can only see your markups after the Redline MCP is added. Do this once, before your first request:
+
+```bash
+claude mcp add --scope user redline -- node /absolute/path/to/redline/mcp/server.js
+```
+
+```bash
+claude mcp list        # should show: redline … ✓ Connected
+```
+
+For Claude Desktop, ChatGPT, Codex CLI or Antigravity, see [Connect the MCP server](#connect-the-mcp-server).
+Also make sure the desktop app is running (`npm run app`); look for the ✎ icon in the menu bar or tray.
+
+### Step 2: Mark up the screen
+
+Open the page or app you want to change and press **⌥⇧M** (macOS) or **Alt+Shift+M** (Windows/Linux).
+The screen freezes and the Redline toolbar appears at the top.
+
+1. Choose a tool: **Box (R)**, **Arrow (A)**, **Pen (P)** or **Pin (I)**.
+2. Click or drag on the thing you want changed. A numbered mark appears.
+3. Type what should change in the comment box, for example *"make this text a little bigger"*.
+   Set the status there too, or delete the mark.
+4. Add more marks if you need them. To give the whole request a note, type it in the
+   **Overall request** field in the toolbar, or press **N**.
+5. Click **Save**, or press **⌘↵** / **Ctrl+Enter**. Press **Esc** to cancel.
+
+![Marking up a web page: a red pin on the "Meet Poshak AI Agent" heading with the comment "make this text a little bigger"](docs/images/1-mark-up.webp)
+
+### Step 3: Check it in the history
+
+Press **⌥⇧H** / **Alt+Shift+H**, or click **History** in the toolbar, to see every request.
+The tabs sort them by where they stand:
+
+| Tab | Meaning |
+| --- | --- |
+| **To do** | New requests, and requests the agent is still working on |
+| **Confirm** | The agent says it's finished; waiting for you to check |
+| **Done** | You confirmed the result |
+| **All** | Everything |
+
+Each card shows the screenshot, your first comment, the app it came from, and how many marks are finished.
+Click a card to reopen the request and edit it.
+
+![The History panel with the new request "make this text a little bigger" listed under To do](docs/images/2-history.webp)
+
+### Step 4: Ask Claude to apply it
+
+Open Claude in the project that contains that UI (here, the website's code) and ask in plain words:
+
+> read the Redline comments and fix the things mentioned there
+
+You can also say *"apply my latest Redline"*, or, in Claude Code, run `/mcp__redline__apply_latest`.
+
+![Asking Claude in the Code tab: "read the redline comments and fix the things mentioned there"](docs/images/3-ask-claude.png)
+
+Claude then:
+
+1. calls `get_edit_request` and receives the annotated screenshot, a zoomed crop of each mark and its coordinates;
+2. finds the matching code from the visible text, the page URL and the layout, and makes the change;
+3. calls `update_edit_request_status` to move each mark to **Waiting for confirmation**, with a note naming the file it changed.
+
+### Step 5: Confirm the result
+
+Reload the page and check the change. In the History, the request is now under **Confirm**.
+Open it, click a mark, and choose **✓ Looks good** (or **Confirm all**). If it isn't right, choose **↺ Not done**
+and add a comment saying what's still wrong. The mark goes back to **To do**, and the next time you ask,
+Claude picks it up again.
 
 ## MCP reference
 
