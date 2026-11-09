@@ -4,6 +4,11 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
+> A real-time visual feedback tool for AI-driven frontend development. Triggered by a hotkey, it lets you
+> draw and annotate UI/UX changes directly on your screen—from layout fixes to styling tweaks. The Electron
+> menu-bar app and built-in MCP server feed annotated screenshots straight to Claude or any AI agent to
+> apply code changes instantly.
+
 Redline is a small desktop app plus an [MCP](https://modelcontextprotocol.io) server.
 Press a hotkey, draw boxes, arrows and pins on whatever is on screen, and write what should change.
 Then tell Claude, ChatGPT, Antigravity or any MCP-capable agent *"apply my latest Redline"*. The agent gets
