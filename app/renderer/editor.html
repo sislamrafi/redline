@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'">
+  <title>Redline</title>
+  <link rel="stylesheet" href="editor.css">
+</head>
+<body>
+  <div id="stage">
+    <canvas id="canvas"></canvas>
+    <div id="empty" hidden>No edit requests yet — press <b>⌥⇧M</b> anywhere to mark up your screen.</div>
+  </div>
+
+  <div id="toolbar" role="toolbar">
+    <div id="grip" title="Drag to move the toolbar (position is remembered)"><span></span><span></span><span></span></div>
+    <div class="group tools">
+      <button data-tool="rect" title="Box (R)" class="active"><svg viewBox="0 0 20 20"><rect x="3" y="5" width="14" height="10" rx="1.5"/></svg><kbd>R</kbd></button>
+      <button data-tool="arrow" title="Arrow (A)"><svg viewBox="0 0 20 20"><path d="M4 16 L15 5 M8 5 H15 V12"/></svg><kbd>A</kbd></button>
+      <button data-tool="pen" title="Pen (P)"><svg viewBox="0 0 20 20"><path d="M3 14 C6 6, 9 16, 12 9 S 16 6, 17 8"/></svg><kbd>P</kbd></button>
+      <button data-tool="pin" title="Pin (I)"><svg viewBox="0 0 20 20"><circle cx="10" cy="8" r="4"/><path d="M10 12 V18"/></svg><kbd>I</kbd></button>
+    </div>
+    <div class="sep"></div>
+    <input id="note" type="text" placeholder="Overall request (optional) — press N" spellcheck="false">
+    <span id="req-status" class="pill" hidden></span>
+    <button id="confirm-all" class="ok" hidden title="Mark every “waiting for confirmation” item as done">✓ Confirm all</button>
+    <div class="sep"></div>
+    <button id="history-btn" class="ghost" title="History (H)">History <span class="count" id="todo-count" hidden></span></button>
+    <button id="undo" title="Undo (⌘Z)" class="ghost">Undo</button>
+    <button id="delete-req" class="danger ghost" hidden title="Delete this request">Delete</button>
+    <button id="cancel" title="Close (Esc)" class="ghost">Cancel</button>
+    <button id="save" title="Save (⌘↵)" class="primary">Save <span class="count">0</span></button>
+  </div>
+
+  <div id="hint">Drag to mark · drag a mark or its number to move it · click a number to edit · <b>H</b> history · <b>⌘↵</b> save · <b>Esc</b> close</div>
+
+  <aside id="drawer" hidden>
+    <header>
+      <h2>History</h2>
+      <button id="drawer-close" title="Close (H)">✕</button>
+    </header>
+    <nav id="filters">
+      <button data-filter="active" class="active">To do <i></i></button>
+      <button data-filter="review">Confirm <i></i></button>
+      <button data-filter="done">Done <i></i></button>
+      <button data-filter="all">All <i></i></button>
+    </nav>
+    <div id="list"></div>
+  </aside>
+
+  <div id="popover" hidden>
+    <div class="pop-head">
+      <span class="badge"></span><span class="pop-title"></span>
+      <select id="mark-status" title="Status of this mark">
+        <option value="open">Open</option>
+        <option value="in_progress">In progress</option>
+        <option value="partial">Partially done</option>
+        <option value="review">Waiting for confirmation</option>
+        <option value="done">Done</option>
+        <option value="wontfix">Won't fix</option>
+      </select>
+      <button class="del" title="Delete mark (⌘⌫)">Delete</button>
+    </div>
+    <div id="agent-note" hidden></div>
+    <div id="review-actions" hidden>
+      <button class="ok" data-act="confirm">✓ Looks good</button>
+      <button class="ghost" data-act="reopen">↺ Not done — reopen</button>
+    </div>
+    <textarea rows="3" placeholder="What should change here?  (Enter to confirm)"></textarea>
+  </div>
+
+  <div id="modal" hidden>
+    <div class="box"><p></p><div class="actions"><button class="ghost" data-v="0">Cancel</button><button class="danger-solid" data-v="1">OK</button></div></div>
+  </div>
+
+  <div id="toast" hidden></div>
+
+  <script src="editor.js"></script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+{
+  "name": "redline",
+  "version": "0.1.0",
+  "description": "Redline: hotkey screen markup for UI edits + Redline MCP server so Claude/agents can fetch and apply them",
+  "type": "module",
+  "main": "app/main.js",
+  "bin": {
+    "redline-mcp": "mcp/server.js"
+  },
+  "scripts": {
+    "app": "electron .",
+    "mcp": "node mcp/server.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "electron": "^45.2.3"
+  },
+  "license": "MIT",
+  "author": "S Islam Rafi",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sislamrafi/redline.git"
+  }
+}

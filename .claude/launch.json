@@ -1,0 +1,6 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "editor-demo", "runtimeExecutable": "python3", "runtimeArgs": ["-m", "http.server", "5178", "-d", "app/renderer"], "port": 5178 }
+  ]
+}
