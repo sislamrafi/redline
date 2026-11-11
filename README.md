@@ -2,6 +2,9 @@
 
 **Mark up your screen, and let your AI agent make the UI changes.**
 
+[![Release](https://img.shields.io/github/v/release/sislamrafi/redline?include_prereleases&label=release&color=f0452b)](https://github.com/sislamrafi/redline/releases)
+[![Downloads](https://img.shields.io/github/downloads/sislamrafi/redline/total?color=1f211d)](https://github.com/sislamrafi/redline/releases)
+[![Website](https://img.shields.io/badge/website-redlinez.org-f0452b)](https://redlinez.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 > A real-time visual feedback tool for AI-driven frontend development. Triggered by a hotkey, it lets you
@@ -15,7 +18,9 @@ Then tell Claude, ChatGPT, Antigravity or any MCP-capable agent *"apply my lates
 the annotated screenshot, a zoomed crop of every mark and exact coordinates. It finds the matching code,
 makes the changes and reports back per mark, and you confirm each one in the app.
 
-![Redline marking up a web page](docs/images/1-mark-up.webp)
+<p align="center">
+  <img src="docs/images/redline-demo.svg" width="880" alt="Animated demo: a checkout button is marked up with the comment 'make the button full width', then Claude reads the Redline request, edits the code and the button becomes full width">
+</p>
 
 ```
 ⌥⇧M / Alt+Shift+M  ──►  freeze-frame of the screen under your cursor
@@ -26,8 +31,29 @@ makes the changes and reports back per mark, and you confirm each one in the app
                    ──►  you click ✓ Looks good  (or ↺ Not done)
 ```
 
+<p align="center">
+  <img src="docs/images/redline-flow.svg" width="880" alt="How it works: press the hotkey, mark and comment, saved to history, agent fixes it, you confirm">
+</p>
+
+## Download
+
+**v0.0.1-beta** (pre-release) · [all releases](https://github.com/sislamrafi/redline/releases)
+
+| Platform | Installer |
+|---|---|
+| macOS · Apple silicon | [Redline-0.0.1-beta-mac-arm64.dmg](https://github.com/sislamrafi/redline/releases/download/v0.0.1-beta/Redline-0.0.1-beta-mac-arm64.dmg) |
+| macOS · Intel | [Redline-0.0.1-beta-mac-x64.dmg](https://github.com/sislamrafi/redline/releases/download/v0.0.1-beta/Redline-0.0.1-beta-mac-x64.dmg) |
+| Windows 10 / 11 · x64 | [Redline-0.0.1-beta-win-x64.exe](https://github.com/sislamrafi/redline/releases/download/v0.0.1-beta/Redline-0.0.1-beta-win-x64.exe) |
+| Linux · x64 (any distro) | [Redline-0.0.1-beta-linux-x86_64.AppImage](https://github.com/sislamrafi/redline/releases/download/v0.0.1-beta/Redline-0.0.1-beta-linux-x86_64.AppImage) |
+| Linux · Debian / Ubuntu | [Redline-0.0.1-beta-linux-amd64.deb](https://github.com/sislamrafi/redline/releases/download/v0.0.1-beta/Redline-0.0.1-beta-linux-amd64.deb) |
+
+The builds are not code-signed yet, so the first launch shows a security prompt
+(macOS: System Settings → Privacy & Security → *Open Anyway*; Windows: *More info → Run anyway*).
+The app includes the MCP server: open **Connect an agent** from the menu-bar / tray icon to set up Claude, Codex, Cursor and others.
+
 ## Contents
 
+- [Download](#download)
 - [Why](#why)
 - [Features](#features)
 - [Platform support](#platform-support)

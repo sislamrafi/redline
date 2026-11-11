@@ -267,3 +267,16 @@ call get_edit_request, fix each mark in this codebase, and set each one to "revi
     addEventListener('resize', () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(draw); });
   }
 })();
+
+// Highlight the visitor's OS in the download section and point the Mac button at the right chip.
+(() => {
+  const ua = navigator.userAgent, plat = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || '';
+  const os = /Win/i.test(plat + ua) ? 'win' : /Mac/i.test(plat + ua) ? 'mac' : /Linux|X11/i.test(plat + ua) && !/Android/i.test(ua) ? 'linux' : null;
+  const card = os && document.querySelector(`.platform[data-os="${os}"]`);
+  if (card) card.classList.add('recommended');
+  if (os !== 'mac' || !navigator.userAgentData || !navigator.userAgentData.getHighEntropyValues) return;
+  navigator.userAgentData.getHighEntropyValues(['architecture']).then(({ architecture }) => {
+    const btn = document.querySelector('.platform[data-os="mac"] .btn[data-dl-intel]');
+    if (btn && architecture === 'x86') btn.href = btn.dataset.dlIntel;
+  }).catch(() => {});
+})();

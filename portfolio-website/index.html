@@ -188,8 +188,8 @@
                 <div class="card-title">Checkout</div>
                 <div class="card-sub">Review your order</div>
                 <div class="row"><span>Pro plan · yearly</span><span>$96.00</span></div>
-                <div class="row"><span>Tax</span><span>$0.00</span></div>
-                <div class="row total"><span>Total</span><span class="total-price">$96.00</span></div>
+                <div class="row"><span>Tax <span class="rate">8% of $96.00</span></span><span>$7.68</span></div>
+                <div class="row total"><span>Total</span><span class="total-price">$103.68</span></div>
                 <button class="pay" tabindex="-1">Pay now</button>
                 <div class="fine">Secured by Stripe · Cancel anytime</div>
               </div>
@@ -403,24 +403,27 @@ codex mcp add redline -- \
             <span class="index">MACOS</span>
             <h3>Apple silicon &amp; Intel</h3>
             <p>Menu-bar app with its own Screen Recording permission. Captures app, window and URL context.</p>
-            <ul><li><code>.dmg</code> · arm64</li><li><code>.dmg</code> · x64</li></ul>
-            <a class="btn primary" href="https://github.com/sislamrafi/redline/releases/latest" target="_blank" rel="noopener">Download for Mac</a>
+            <ul><li><a href="https://github.com/sislamrafi/redline/releases/download/v0.0.1-beta/Redline-0.0.1-beta-mac-arm64.dmg"><code>.dmg</code> · Apple silicon (arm64)</a></li><li><a href="https://github.com/sislamrafi/redline/releases/download/v0.0.1-beta/Redline-0.0.1-beta-mac-x64.dmg"><code>.dmg</code> · Intel (x64)</a></li></ul>
+            <a class="btn primary" href="https://github.com/sislamrafi/redline/releases/download/v0.0.1-beta/Redline-0.0.1-beta-mac-arm64.dmg" data-dl-intel="https://github.com/sislamrafi/redline/releases/download/v0.0.1-beta/Redline-0.0.1-beta-mac-x64.dmg">Download for Mac</a>
           </article>
           <article class="platform" data-os="win">
             <span class="index">WINDOWS</span>
             <h3>Windows 10 &amp; 11</h3>
             <p>Lives in the system tray. No extra permission needed for screen capture.</p>
-            <ul><li><code>.exe</code> installer · x64</li></ul>
-            <a class="btn primary" href="https://github.com/sislamrafi/redline/releases/latest" target="_blank" rel="noopener">Download for Windows</a>
+            <ul><li><a href="https://github.com/sislamrafi/redline/releases/download/v0.0.1-beta/Redline-0.0.1-beta-win-x64.exe"><code>.exe</code> installer · x64</a></li></ul>
+            <a class="btn primary" href="https://github.com/sislamrafi/redline/releases/download/v0.0.1-beta/Redline-0.0.1-beta-win-x64.exe">Download for Windows</a>
           </article>
           <article class="platform" data-os="linux">
             <span class="index">LINUX</span>
             <h3>X11 &amp; Wayland</h3>
             <p>Tray app for X11; on Wayland, capture goes through the desktop portal.</p>
-            <ul><li><code>.AppImage</code> · x64</li><li><code>.deb</code> · amd64</li></ul>
-            <a class="btn primary" href="https://github.com/sislamrafi/redline/releases/latest" target="_blank" rel="noopener">Download for Linux</a>
+            <ul><li><a href="https://github.com/sislamrafi/redline/releases/download/v0.0.1-beta/Redline-0.0.1-beta-linux-x86_64.AppImage"><code>.AppImage</code> · x64</a></li><li><a href="https://github.com/sislamrafi/redline/releases/download/v0.0.1-beta/Redline-0.0.1-beta-linux-amd64.deb"><code>.deb</code> · amd64 (Debian, Ubuntu)</a></li></ul>
+            <a class="btn primary" href="https://github.com/sislamrafi/redline/releases/download/v0.0.1-beta/Redline-0.0.1-beta-linux-x86_64.AppImage">Download for Linux</a>
           </article>
         </div>
+        <p class="release-note"><span class="index">v0.0.1-beta</span> Pre-release builds, not yet signed: the first launch shows a security prompt.
+          <a href="https://github.com/sislamrafi/redline/releases/tag/v0.0.1-beta" target="_blank" rel="noopener">Release notes</a> ·
+          <a href="https://github.com/sislamrafi/redline/releases" target="_blank" rel="noopener">All releases ↗</a></p>
         <div class="source">
           <span class="index">OR RUN FROM SOURCE</span>
 <pre><code>git clone https://github.com/sislamrafi/redline.git

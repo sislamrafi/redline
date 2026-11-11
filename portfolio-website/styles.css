@@ -296,6 +296,7 @@ main:focus { outline: none; }
 .card-title { font-size: 22px; font-weight: 700; letter-spacing: -.03em; }
 .card-sub { font-size: 13px; color: var(--muted); margin: 2px 0 20px; }
 .row { display: flex; justify-content: space-between; padding: 9px 0; font-size: 14px; color: #44473f; }
+.row .rate { margin-left: 6px; font-size: 12px; color: var(--muted); }
 .row.total { margin-top: 8px; padding-top: 14px; border-top: 1px dashed var(--line); color: var(--fg); }
 .total-price { font-weight: 400; transition: font-weight .3s, color .6s; }
 .pay {
@@ -479,6 +480,14 @@ main:focus { outline: none; }
 .platform ul { list-style: none; margin: 20px 0 28px; padding: 0; font-size: 13px; color: var(--dark-muted); }
 .platform li { padding: 6px 0; border-top: 1px dashed var(--dark-line); }
 .platform code { color: var(--dark-fg); }
+.platform li a { display: flex; align-items: baseline; gap: 6px; color: inherit; text-decoration: none; }
+.platform li a::after { content: "↓"; margin-left: auto; color: var(--dark-muted); transition: color .2s, transform .2s var(--ease); }
+.platform li a:hover { color: var(--dark-fg); }
+.platform li a:hover::after { color: var(--accent); transform: translateY(2px); }
+.release-note { margin: 16px 0 0; font-size: 13px; color: var(--dark-muted); }
+.release-note .index { margin-right: 8px; color: var(--dark-fg); }
+.release-note a { color: var(--dark-fg); }
+.release-note a:hover { color: var(--accent); }
 .platform .btn { margin-top: auto; justify-content: center; background: var(--dark-fg); color: var(--dark); border-color: var(--dark-fg); }
 .platform .btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
 .source { margin-top: 16px; padding: 20px 24px; border: 1px dashed var(--dark-line); border-radius: 8px; }
