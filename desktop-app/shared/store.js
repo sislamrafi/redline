@@ -40,6 +40,42 @@ export function ensureDirs() {
   fs.mkdirSync(REQUESTS_DIR, { recursive: true });
 }
 
+// ---------- app settings + connected agents ----------
+//   ~/.redline/settings.json   { setupDone, ... }        written by the app
+//   ~/.redline/agents.json     { "<client name>": { name, version, firstSeen, lastSeen } }
+//                              written by the MCP server each time an agent connects or calls a tool,
+//                              so the app can show "Claude Code connected" in real time.
+export const SETTINGS_FILE = path.join(HOME, 'settings.json');
+export const AGENTS_FILE = path.join(HOME, 'agents.json');
+
+function readJson(file, fallback) {
+  try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return fallback; }
+}
+function writeJson(file, data) {
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  const tmp = `${file}.${process.pid}.tmp`;
+  fs.writeFileSync(tmp, JSON.stringify(data, null, 2));
+  fs.renameSync(tmp, file); // atomic, so a watcher never reads half a file
+}
+export const readSettings = () => readJson(SETTINGS_FILE, {});
+export function writeSettings(patch) {
+  const s = { ...readSettings(), ...patch };
+  writeJson(SETTINGS_FILE, s);
+  return s;
+}
+export const readAgents = () => readJson(AGENTS_FILE, {});
+export function touchAgent(info = {}) {
+  const name = info.name || 'unknown-agent';
+  const all = readAgents();
+  const now = new Date().toISOString();
+  const prev = all[name];
+  // Skip rewriting for rapid repeat calls; a fresh connection always records.
+  if (prev && !info.connect && Date.parse(now) - Date.parse(prev.lastSeen) < 30_000) return prev;
+  all[name] = { name, version: info.version || prev?.version, firstSeen: prev?.firstSeen || now, lastSeen: now, ...(info.connect ? { lastConnect: now } : { lastConnect: prev?.lastConnect }) };
+  try { writeJson(AGENTS_FILE, all); } catch { /* never break the MCP server over this */ }
+  return all[name];
+}
+
 export function newId(date = new Date()) {
   const pad = (n) => String(n).padStart(2, '0');
   const stamp = `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}-${pad(date.getHours())}${pad(date.getMinutes())}${pad(date.getSeconds())}`;
@@ -126,6 +162,24 @@ export function updateStatus(id, { status, note, marks = [], by = 'agent' } = {}
   r.status = status || deriveStatus(r.marks);
   if (note) r.resolutionNote = note;
   (r.history ||= []).push({ at, by, status: r.status, note: note || undefined, marks: marks.length ? marks : undefined });
+  writeRequest(r);
+  return r;
+}
+
+/**
+ * Record that an agent fetched (read) a request. The first fetch sets `agentSeenAt`;
+ * every fetch adds a "fetched" event to the history (repeats within a minute are merged),
+ * so the app can show when the agent first saw the request and when it came back to it.
+ */
+export function noteFetched(id, { agent } = {}) {
+  const r = readRequest(id);
+  if (!r) return null;
+  const at = new Date().toISOString();
+  r.agentSeenAt ||= at;
+  const h = (r.history ||= []);
+  const last = h[h.length - 1];
+  if (last?.event === 'fetched' && Date.parse(at) - Date.parse(last.at) < 60_000) last.at = at;
+  else h.push({ at, by: 'agent', event: 'fetched', ...(agent ? { agent } : {}) });
   writeRequest(r);
   return r;
 }

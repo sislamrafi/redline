@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <!-- Redline logo mark. Dark-background version: transparent, ink #EDEEE8, red #F0463F. -->
+  <g stroke="#EDEEE8" stroke-linecap="round" stroke-linejoin="round">
+    <!-- screen -->
+    <rect x="40" y="96" width="432" height="300" rx="18" stroke-width="12"/>
+    <!-- browser bar with an active tab -->
+    <path d="M46 160 H74 L86 136 Q90 128 99 128 H178 Q187 128 191 136 L203 160 H466" stroke-width="10"/>
+    <path d="M110 147 H160" stroke-width="8"/>
+    <path d="M212 135 Q212 128 219 128 H316 Q324 128 328 136 L340 160 H206 Z" fill="#3A3D45" stroke="none"/>
+    <path d="M240 145 H276" stroke-width="7"/>
+    <!-- </> -->
+    <path d="M412 136 L402 145 L412 154 M440 136 L450 145 L440 154 M431 133 L421 157" stroke-width="6"/>
+    <!-- stand -->
+    <path d="M160 444 H352" stroke-width="12"/>
+  </g>
+  <!-- content lines -->
+  <g stroke="#5A5E66" stroke-width="6" stroke-linecap="round">
+    <path d="M78 190 H160"/>
+    <path d="M78 208 H118 M134 208 H196"/>
+  </g>
+  <!-- the redline: a hand-drawn double loop + pointer -->
+  <g stroke="#F0463F" stroke-linecap="round" stroke-linejoin="round" stroke-width="9">
+    <path d="M335 66 C 290 60, 236 92, 222 132 C 208 172, 240 190, 282 178 C 330 164, 372 128, 368 96 C 364 66, 318 66, 286 88 C 254 110, 240 150, 262 166 C 286 182, 340 160, 356 140"/>
+    <path d="M330 202 L344 254 M330 202 L380 218 M344 214 L394 262"/>
+  </g>
+</svg>

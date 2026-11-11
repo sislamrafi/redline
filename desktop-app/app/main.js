@@ -14,7 +14,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   ensureDirs, newId, requestDir, readRequest, writeRequest, listRequests, deleteRequest,
-  updateStatus, deriveStatus, progress, REQUESTS_DIR,
+  updateStatus, deriveStatus, progress, REQUESTS_DIR, HOME, AGENTS_FILE, readAgents, readSettings, writeSettings,
 } from '../shared/store.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -25,6 +25,7 @@ const pretty = (k) => k.replace('Alt', '⌥').replace('Shift', '⇧').replace('C
 
 let tray = null;
 let overlay = null;
+let dash = null; // the History window
 let busy = false;
 
 app.setName('Redline');
@@ -33,7 +34,7 @@ if (!SELFTEST && !app.requestSingleInstanceLock()) {
 }
 app.on('second-instance', (_e, argv) => {
   if (argv.includes('--capture')) startCapture();
-  if (argv.includes('--history')) openHistory();
+  if (argv.includes('--history')) openDashboard();
 });
 
 app.whenReady().then(async () => {
@@ -41,20 +42,34 @@ app.whenReady().then(async () => {
   if (process.platform === 'darwin' && app.dock) app.dock.hide();
   if (SELFTEST) return runSelfTest();
 
-  tray = new Tray(nativeImage.createEmpty());
+  tray = new Tray(trayIcon());
   tray.setToolTip('Redline');
   refreshTrayMenu();
   watchStore();
 
-  for (const [key, fn] of [[HOTKEY, startCapture], [HISTORY_HOTKEY, openHistory]]) {
+  for (const [key, fn] of [[HOTKEY, startCapture], [HISTORY_HOTKEY, () => openDashboard()]]) {
     const ok = globalShortcut.register(key, fn);
     console.log(ok ? `[redline] hotkey ${key} registered` : `[redline] could not register ${key} (in use?)`);
   }
   console.log(`[redline] requests saved under ${REQUESTS_DIR}`);
   if (process.platform === 'darwin') console.log(`[redline] screen recording permission: ${systemPreferences.getMediaAccessStatus('screen')}`);
   if (process.argv.includes('--capture')) startCapture();
-  if (process.argv.includes('--history')) openHistory();
+  if (process.argv.includes('--history')) openDashboard();
+  // First launch: open History with the setup guide (connect your agent).
+  else if (!readSettings().setupDone) openDashboard(null, { setup: true });
 });
+
+// macOS: a black "template" image that the menu bar tints for light/dark mode.
+// Windows/Linux: the full-color icon.
+function trayIcon() {
+  const dir = path.join(__dirname, 'assets');
+  if (process.platform === 'darwin') {
+    const img = nativeImage.createFromPath(path.join(dir, 'trayTemplate.png'));
+    img.setTemplateImage(true);
+    return img;
+  }
+  return nativeImage.createFromPath(path.join(dir, 'tray-color.png'));
+}
 
 app.on('will-quit', () => globalShortcut.unregisterAll());
 app.on('window-all-closed', () => { /* stay alive in tray */ });
@@ -64,11 +79,12 @@ function refreshTrayMenu() {
   const all = listRequests();
   const active = all.filter((r) => ['open', 'in_progress', 'partial'].includes(r.status));
   const review = all.filter((r) => r.status === 'review');
-  tray.setTitle(`✎${active.length ? ` ${active.length}` : ''}${review.length ? ` · ${review.length}?` : ''}`);
-  const item = (r) => ({ label: `  ${(r.title || r.id).slice(0, 48)}  (${progress(r)})`, click: () => openHistory(r.id) });
+  tray.setTitle(`${active.length ? `${active.length}` : ''}${review.length ? `${active.length ? ' · ' : ''}${review.length}?` : ''}`);
+  const item = (r) => ({ label: `  ${(r.title || r.id).slice(0, 48)}  (${progress(r)})`, click: () => openDashboard(r.id) });
   tray.setContextMenu(Menu.buildFromTemplate([
     { label: `Mark up screen\t${pretty(HOTKEY)}`, click: startCapture },
-    { label: `History…\t${pretty(HISTORY_HOTKEY)}`, click: () => openHistory() },
+    { label: `History…\t${pretty(HISTORY_HOTKEY)}`, click: () => openDashboard() },
+    { label: 'Connect an agent…', click: () => openDashboard(null, { setup: true }) },
     { type: 'separator' },
     { label: `${active.length} to do`, enabled: false },
     ...active.slice(0, 6).map(item),
@@ -90,9 +106,19 @@ function watchStore() {
       t = setTimeout(() => {
         refreshTrayMenu();
         overlay?.webContents.send('history:changed');
+        dash?.webContents.send('history:changed');
       }, 250);
     });
   } catch (err) { console.warn('[redline] cannot watch store', err.message); }
+  // The MCP server writes agents.json when an agent connects or calls a tool.
+  let a = null;
+  try {
+    fs.watch(HOME, (_ev, file) => {
+      if (file && file !== path.basename(AGENTS_FILE)) return;
+      clearTimeout(a);
+      a = setTimeout(() => dash?.webContents.send('agents:changed', readAgents()), 150);
+    });
+  } catch (err) { console.warn('[redline] cannot watch agents', err.message); }
 }
 
 // ---------- context about what's on screen (best effort, never blocks capture) ----------
@@ -157,6 +183,29 @@ function openHistory(id) {
   busy = true;
   const display = screen.getDisplayNearestPoint(screen.getCursorScreenPoint());
   openOverlay(display, { mode: 'history', loadId: id || listRequests()[0]?.id || null, context: { scaleFactor: display.scaleFactor } });
+}
+
+// The History window: a normal app window (not the full-screen editor) where requests can be
+// browsed, their status changed in one click, and the agent's activity followed over time.
+function openDashboard(id, { setup = false } = {}) {
+  if (dash) {
+    if (id) dash.webContents.send('dash:select', { id });
+    if (setup) dash.webContents.send('setup:open');
+    if (dash.isMinimized()) dash.restore();
+    dash.show(); dash.focus(); app.focus({ steal: true });
+    return;
+  }
+  const mac = process.platform === 'darwin';
+  dash = new BrowserWindow({
+    width: 1120, height: 760, minWidth: 780, minHeight: 520, show: false,
+    title: 'Redline — History', backgroundColor: '#171815',
+    ...(mac ? { titleBarStyle: 'hiddenInset', trafficLightPosition: { x: 16, y: 18 } } : { autoHideMenuBar: true }),
+    icon: mac ? undefined : path.join(__dirname, 'assets', 'tray-color@2x.png'),
+    webPreferences: { preload: path.join(__dirname, 'preload.cjs') },
+  });
+  dash.loadFile(path.join(__dirname, 'renderer', 'history.html'), { query: { ...(id ? { id } : {}), ...(setup ? { setup: '1' } : {}) } });
+  dash.once('ready-to-show', () => { dash.show(); dash.focus(); app.focus({ steal: true }); });
+  dash.on('closed', () => { dash = null; });
 }
 
 async function captureDisplay(display) {
@@ -283,6 +332,11 @@ ipcMain.on('cancel', () => overlay?.close());
 
 // ---------- history ----------
 
+// When the agent first touched a request: the explicit fetch time, or (for requests made
+// before fetches were recorded) the first history entry written by an agent.
+const firstAgentAt = (r) => r.agentSeenAt || (r.history || []).find((h) => h.by === 'agent')?.at || null;
+const lastAgentAt = (r) => [...(r.history || [])].reverse().find((h) => h.by === 'agent')?.at || null;
+
 ipcMain.handle('history:list', () => listRequests().map((r) => {
   const thumb = path.join(requestDir(r.id), 'thumb.png');
   const preview = path.join(requestDir(r.id), 'preview.png');
@@ -290,12 +344,52 @@ ipcMain.handle('history:list', () => listRequests().map((r) => {
     fs.writeFileSync(thumb, nativeImage.createFromPath(preview).resize({ width: 360, quality: 'good' }).toPNG());
   }
   return {
-    id: r.id, title: r.title, status: r.status, createdAt: r.createdAt, updatedAt: r.updatedAt,
+    id: r.id, title: r.title, note: r.note, status: r.status, createdAt: r.createdAt, updatedAt: r.updatedAt,
     app: r.context?.app, url: r.context?.url, progress: progress(r),
-    marks: r.marks.map((m) => ({ n: m.n, status: m.status, color: m.color })),
+    seenAt: firstAgentAt(r), agentAt: lastAgentAt(r),
+    marks: r.marks.map((m) => ({ n: m.n, status: m.status, color: m.color, comment: m.comment })),
     thumb: fs.existsSync(thumb) ? toDataUrl(thumb) : null,
   };
 }));
+
+// Everything the History window shows for one request: the full JSON plus the annotated preview.
+ipcMain.handle('history:detail', (_e, id) => {
+  const request = readRequest(id);
+  if (!request) throw new Error(`No request ${id}`);
+  const dir = requestDir(id);
+  const preview = ['preview.png', 'annotated.png', 'screenshot.png'].map((f) => path.join(dir, f)).find((f) => fs.existsSync(f));
+  return { request, preview: preview ? toDataUrl(preview) : null, seenAt: firstAgentAt(request) };
+});
+
+// Open a request in the full-screen editor (to move marks, edit comments, add marks).
+ipcMain.handle('history:edit', (_e, id) => { openHistory(id); return true; });
+ipcMain.handle('capture', () => { setTimeout(startCapture, dash?.isFocused() ? 250 : 0); return true; });
+ipcMain.handle('reveal', (_e, id) => { shell.openPath(requestDir(id)); return true; });
+
+// ---------- setup: connect an agent ----------
+const MCP_SERVER = path.resolve(__dirname, '..', 'mcp', 'server.js');
+const CLAUDE_COMMAND = path.resolve(__dirname, '..', 'claude', 'commands', 'redline.md');
+ipcMain.handle('setup:info', () => ({
+  serverPath: MCP_SERVER.split(path.sep).join('/'), // forward slashes work in every config file and shell
+  serverExists: fs.existsSync(MCP_SERVER),
+  platform: process.platform,
+  home: app.getPath('home'),
+  appData: app.getPath('appData'),
+  agents: readAgents(),
+  settings: readSettings(),
+  hotkey: pretty(HOTKEY),
+}));
+ipcMain.handle('setup:done', (_e, patch = {}) => writeSettings({ setupDone: true, ...patch }));
+ipcMain.handle('setup:settings', (_e, patch = {}) => writeSettings(patch));
+ipcMain.handle('agents:list', () => readAgents());
+// Copies the /redline slash command into ~/.claude/commands for Claude Code.
+ipcMain.handle('setup:install-claude-command', () => {
+  const dir = path.join(app.getPath('home'), '.claude', 'commands');
+  fs.mkdirSync(dir, { recursive: true });
+  fs.copyFileSync(CLAUDE_COMMAND, path.join(dir, 'redline.md'));
+  return path.join(dir, 'redline.md');
+});
+ipcMain.handle('open-external', (_e, url) => { if (/^(https?|cursor|vscode):/.test(url)) shell.openExternal(url); return true; });
 
 ipcMain.handle('history:load', (_e, id) => {
   const request = readRequest(id);

@@ -1,0 +1,51 @@
+name: Release
+
+# Push a version tag (matching package.json "version") to build installers for every OS
+# and attach them to a DRAFT GitHub Release. Review the draft, then click "Publish release".
+#   npm version 0.2.0 && git push --follow-tags
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest      # Redline-x.y.z-mac-arm64.dmg + Redline-x.y.z-mac-x64.dmg
+            target: --mac
+          - os: windows-latest    # Redline-x.y.z-win-x64.exe (NSIS installer)
+            target: --win
+          - os: ubuntu-latest     # Redline-x.y.z-linux-x86_64.AppImage + Redline-x.y.z-linux-amd64.deb
+            target: --linux
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: desktop-app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: desktop-app/package-lock.json
+      - run: npm ci
+      - name: Build and upload to draft release
+        run: npx electron-builder ${{ matrix.target }} --publish ${{ startsWith(github.ref, 'refs/tags/') && 'always' || 'never' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: redline-${{ runner.os }}
+          path: |
+            desktop-app/dist/*.dmg
+            desktop-app/dist/*.exe
+            desktop-app/dist/*.AppImage
+            desktop-app/dist/*.deb
+          if-no-files-found: error

@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Redline — point at it, your agent fixes it</title>
+  <meta name="description" content="Mark up your screen with a hotkey and let Claude, Codex or any MCP agent make the UI changes. Open source desktop app + MCP server for macOS, Windows and Linux.">
+  <meta name="theme-color" content="#f6f5f0">
+  <link rel="canonical" href="https://redlinez.org/">
+  <meta property="og:title" content="Redline — point at it, your agent fixes it">
+  <meta property="og:description" content="Draw on your screen, write what should change, and hand it to your AI coding agent over MCP. Open source.">
+  <meta property="og:url" content="https://redlinez.org/">
+  <meta property="og:site_name" content="Redline">
+  <meta property="og:image" content="https://redlinez.org/assets/og.png">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary">
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+  <link rel="alternate icon" href="assets/favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="stylesheet" href="styles.css">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"SoftwareApplication","name":"Redline","url":"https://redlinez.org","applicationCategory":"DeveloperApplication","operatingSystem":"macOS, Windows, Linux","license":"https://opensource.org/licenses/MIT","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"sameAs":["https://github.com/sislamrafi/redline"]}
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="Redline home">
+      <img src="assets/logo.svg" alt="" width="40" height="40">
+      <span>redline</span>
+    </a>
+    <nav class="nav-links" aria-label="Main navigation">
+      <a href="#how">How it works</a>
+      <a href="#agents">Agents</a>
+      <a href="#download">Download</a>
+      <a href="https://github.com/sislamrafi/redline#readme" target="_blank" rel="noopener">Docs</a>
+    </nav>
+    <div class="header-actions">
+      <a class="btn secondary hide-sm" href="https://github.com/sislamrafi/redline" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 15.09 8.26 22 9.27l-5 4.87 1.18 6.88L12 17.77 5.82 21l1.18-6.88-5-4.87 6.91-1.01L12 2Z"/></svg>
+        Star
+      </a>
+      <a class="btn primary" href="#download">Download</a>
+      <button type="button" class="menu-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="site-menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div id="site-menu" class="site-menu" hidden>
+      <a href="#how">How it works</a>
+      <a href="#agents">Agents</a>
+      <a href="#download">Download</a>
+      <a href="https://github.com/sislamrafi/redline#readme" target="_blank" rel="noopener">Docs</a>
+      <a href="https://github.com/sislamrafi/redline" target="_blank" rel="noopener">GitHub ↗</a>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <span id="top"></span>
+
+    <!-- ───────── HERO ───────── -->
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Open source / Visual feedback for AI agents</p>
+        <h1><span>Point at it.</span> <span class="accent">Your agent fixes it.</span></h1>
+        <p class="hero-description">
+          Press a hotkey, draw on anything on your screen, and write what should change.
+          Claude, Codex or any MCP agent gets the picture, the exact spot and the context&nbsp;— then edits the code.
+        </p>
+        <div class="actions">
+          <button class="btn primary" type="button" id="copyPrompt" aria-live="polite">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1Zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Zm0 16H8V7h11v14Z"/></svg>
+            <span class="label">Copy setup prompt</span>
+          </button>
+          <a class="btn secondary" href="https://github.com/sislamrafi/redline" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 15.09 8.26 22 9.27l-5 4.87 1.18 6.88L12 17.77 5.82 21l1.18-6.88-5-4.87 6.91-1.01L12 2Z"/></svg>
+            Star on GitHub
+          </a>
+        </div>
+        <p class="hero-note"><span class="dot"></span> MIT licensed · macOS · Windows · Linux</p>
+        <a class="rotating-link" href="#agents">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 12 12 4M4 4h8v8"/></svg>
+          <span class="rotator" aria-label="Works with Claude Code, Codex, Antigravity and more">
+            <span>Works with Claude Code</span>
+            <span>Works with Codex CLI</span>
+            <span>Works with Antigravity</span>
+            <span>Works with any MCP agent</span>
+          </span>
+        </a>
+      </div>
+
+      <!-- Animated scene: mark a problem on a tablet, the Claude mascot walks over and fixes it -->
+      <figure class="hero-art" aria-label="A tablet screen with two problems marked in red. A small pixel Claude mascot walks to each mark and fixes it, and the marks turn green.">
+        <div class="tablet">
+          <div class="tablet-screen">
+            <div class="mock-toolbar" aria-hidden="true">
+              <span class="tool on">▭ <kbd>R</kbd></span>
+              <span class="tool">↗ <kbd>A</kbd></span>
+              <span class="tool">✎ <kbd>P</kbd></span>
+              <span class="tool">⦿ <kbd>I</kbd></span>
+              <span class="tool-sep"></span>
+              <span class="tool save">Save <b class="count">2</b></span>
+            </div>
+            <div class="mock-page" aria-hidden="true">
+              <div class="mock-nav"><b></b><span></span><span></span><span></span></div>
+              <div class="mock-head">
+                <div class="mock-h1">Ship faster with less</div>
+                <div class="mock-line w80"></div>
+                <div class="mock-line w60"></div>
+              </div>
+              <div class="mock-cta">Get started</div>
+              <div class="mock-cards"><div></div><div></div><div></div></div>
+
+              <!-- mark 1: box around the CTA -->
+              <svg class="mark mark-box" viewBox="0 0 100 40" preserveAspectRatio="none">
+                <rect x="1.5" y="1.5" width="97" height="37" rx="3" pathLength="100"/>
+              </svg>
+              <span class="badge b1"><i>1</i><i>✓</i></span>
+              <span class="comment c1">button is too small &amp; off-center</span>
+
+              <!-- mark 2: pin on the heading -->
+              <span class="pin"></span>
+              <span class="badge b2"><i>2</i><i>✓</i></span>
+              <span class="comment c2">letter spacing is too loose</span>
+
+              <!-- the mascot -->
+              <div class="mascot">
+                <svg viewBox="0 0 16 11" shape-rendering="crispEdges">
+                  <g class="body"><rect x="2" y="0" width="12" height="8"/><rect x="0" y="3" width="2" height="2"/><rect x="14" y="3" width="2" height="2"/><rect class="leg l1" x="3" y="8" width="1" height="3"/><rect class="leg l2" x="5" y="8" width="1" height="3"/><rect class="leg l1" x="10" y="8" width="1" height="3"/><rect class="leg l2" x="12" y="8" width="1" height="3"/></g>
+                  <rect class="eye" x="5" y="2" width="1" height="2"/><rect class="eye" x="10" y="2" width="1" height="2"/>
+                </svg>
+                <span class="spark s-a">✦</span><span class="spark s-b">✦</span><span class="spark s-c">✦</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="phone" aria-hidden="true">
+          <div class="phone-screen">
+            <div class="chat-head"><span class="chat-dot"></span>Claude</div>
+            <div class="msgs">
+            <p class="msg user">apply my latest redline</p>
+            <p class="msg agent m1">Reading 2 marks…</p>
+            <p class="msg agent m2">Fixed #1 — bigger, centered button</p>
+            <p class="msg agent m3">Fixed #2 — tighter heading</p>
+            <p class="msg done m4">✓ 2 marks ready for review</p>
+            </div>
+          </div>
+        </div>
+      </figure>
+    </section>
+
+    <!-- ───────── CAPABILITIES ───────── -->
+    <section class="capabilities" aria-label="What Redline does">
+      <div class="capability">
+        <span class="index">01 / CAPTURE</span>
+        <h2>Freeze. Draw. Comment.</h2>
+        <p>One hotkey freezes the screen under your cursor. Box, arrow, pen or pin — each mark gets its own note.</p>
+      </div>
+      <div class="capability">
+        <span class="index">02 / HAND OFF</span>
+        <h2>Your agent sees what you see.</h2>
+        <p>Annotated screenshot, a zoomed crop per mark and exact coordinates, served over MCP.</p>
+      </div>
+      <div class="capability">
+        <span class="index">03 / CONFIRM</span>
+        <h2>Review every mark.</h2>
+        <p>The agent reports back per mark. You click <em>Looks good</em> or send it back.</p>
+      </div>
+    </section>
+
+    <!-- ───────── DEMO ───────── -->
+    <section class="demo" id="demo" aria-labelledby="demo-title">
+      <div class="section-head">
+        <p class="eyebrow">See it work</p>
+        <h2 id="demo-title">Mark it. Say it. <span class="accent">Done.</span></h2>
+      </div>
+
+      <div class="stage-wrap" role="img" aria-label="Animated demo: a checkout page is marked up with Redline (a box around a small Pay button and a pin on the total). The request is saved to the Redline history, the agent applies both fixes and leaves a note on each mark, and the user confirms them.">
+        <div class="stage" aria-hidden="true">
+
+          <!-- the app being marked up -->
+          <div class="win app-win">
+            <div class="win-bar"><i></i><i></i><i></i><span class="win-url">localhost:3000/checkout</span></div>
+            <div class="page">
+              <div class="pg-nav"><b>acme</b><span>Pricing</span><span>Docs</span><span class="pg-avatar"></span></div>
+              <div class="card">
+                <div class="card-title">Checkout</div>
+                <div class="card-sub">Review your order</div>
+                <div class="row"><span>Pro plan · yearly</span><span>$96.00</span></div>
+                <div class="row"><span>Tax</span><span>$0.00</span></div>
+                <div class="row total"><span>Total</span><span class="total-price">$96.00</span></div>
+                <button class="pay" tabindex="-1">Pay now</button>
+                <div class="fine">Secured by Stripe · Cancel anytime</div>
+              </div>
+
+              <!-- Redline capture overlay -->
+              <div class="rl-overlay">
+                <div class="rl-toolbar">
+                  <span class="t on">▭</span><span class="t">↗</span><span class="t">✎</span><span class="t">⦿</span>
+                  <span class="t-note">Overall request (optional)</span>
+                  <span class="t-txt">History</span><span class="t-txt">Undo</span>
+                  <span class="t-save">Save <b class="rl-count">0</b></span>
+                </div>
+                <div class="rl-box"><span class="rl-badge">1</span></div>
+                <div class="rl-pin"><span class="rl-badge">2</span></div>
+                <div class="rl-chip chip1">make the button full width</div>
+                <div class="rl-chip chip2">total should be bold</div>
+                <div class="rl-pop"><div class="pop-head"><span class="rl-badge">1</span><span class="pop-kind">red box</span><span class="pop-status">Open ▾</span></div><div class="pop-input"><span class="pop-text"></span><span class="pop-caret"></span></div></div>
+                <div class="rl-hint">Drag to mark · <b>⌘↵</b> save · <b>Esc</b> close</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Redline history -->
+          <div class="win hist-win">
+            <div class="hist-head">
+              <img class="hist-logo" src="assets/logo-dark.svg" alt=""><b>Redline</b><span class="hist-title">History</span>
+            </div>
+            <div class="hist-tabs"><span class="ht on">To do <i class="n-todo">0</i></span><span class="ht">Review <i class="n-review">0</i></span><span class="ht">Done <i class="n-done">0</i></span></div>
+            <div class="hist-empty">No requests yet.<br>Press <b>⌥⇧M</b> to mark up your screen.</div>
+            <div class="req">
+              <div class="req-top">
+                <div class="req-thumb"><i></i><i></i></div>
+                <div><b>Checkout polish</b><span>localhost:3000/checkout · just now</span></div>
+              </div>
+              <div class="req-mark m1">
+                <span class="rb">1</span>
+                <div><p>make the button full width</p><p class="note">Claude: Pay button now spans the card (Checkout.tsx)</p></div>
+                <span class="chip st">open</span>
+              </div>
+              <div class="req-mark m2">
+                <span class="rb">2</span>
+                <div><p>total should be bold</p><p class="note">Claude: Total row uses font-semibold</p></div>
+                <span class="chip st">open</span>
+              </div>
+              <div class="req-actions"><span class="ok">✓ Looks good</span><span class="no">↺ Not done</span></div>
+            </div>
+          </div>
+
+          <!-- the agent -->
+          <div class="win term-win">
+            <div class="win-bar dark"><i></i><i></i><i></i><span class="win-url">claude — ~/acme</span></div>
+            <div class="term"></div>
+          </div>
+
+          <!-- keycaps + cursor -->
+          <div class="keycap"></div>
+          <svg class="cursor-ptr" viewBox="0 0 20 24"><path d="M2 2l15 11.5-6.6 1.2 3.9 7.4-3 1.5-3.9-7.4L2 20.6z"/></svg>
+          <span class="click-ring"></span>
+        </div>
+      </div>
+
+      <ol class="demo-steps">
+        <li data-step="1"><span class="index">01</span> Press <kbd>⌥⇧M</kbd></li>
+        <li data-step="2"><span class="index">02</span> Mark &amp; comment</li>
+        <li data-step="3"><span class="index">03</span> Saved to history</li>
+        <li data-step="4"><span class="index">04</span> Agent fixes &amp; leaves notes</li>
+        <li data-step="5"><span class="index">05</span> You confirm</li>
+      </ol>
+    </section>
+
+    <!-- ───────── HOW IT WORKS ───────── -->
+    <section class="how" id="how" aria-labelledby="how-title">
+      <div class="section-head">
+        <p class="eyebrow">How it works</p>
+        <h2 id="how-title">Four steps. <span class="muted">No more “the button under the subtitle, but smaller”.</span></h2>
+      </div>
+
+      <ol class="steps">
+        <li class="step">
+          <span class="index">01</span>
+          <div>
+            <h3>Mark up the screen</h3>
+            <p>Press <kbd>⌥⇧M</kbd> / <kbd>Alt+Shift+M</kbd>. Draw on a browser tab, a native app, a design file — anything. Write what should change, then <kbd>⌘↵</kbd> to save.</p>
+          </div>
+        </li>
+        <li class="step">
+          <span class="index">02</span>
+          <div>
+            <h3>It lands in your history</h3>
+            <p>Requests are plain files in <code>~/.redline</code>. Reopen one any time to move marks, edit comments or delete it.</p>
+          </div>
+        </li>
+        <li class="step">
+          <span class="index">03</span>
+          <div>
+            <h3>Ask your agent</h3>
+            <p>Type <code>/redline</code> in Claude Code (or tell any agent “apply my latest Redline”). It reads the request over MCP, finds the matching code and makes the change.</p>
+          </div>
+        </li>
+        <li class="step">
+          <span class="index">04</span>
+          <div>
+            <h3>Confirm the result</h3>
+            <p>Each mark comes back as <span class="status review">review</span> with a note. Click ✓ to mark it <span class="status done">done</span>, or ↺ to reopen it.</p>
+          </div>
+        </li>
+      </ol>
+
+    </section>
+
+    <!-- ───────── DARK SECTIONS ───────── -->
+    <div class="dark-sections">
+      <canvas class="dither" aria-hidden="true"></canvas>
+
+      <section class="agents" id="agents" aria-labelledby="agents-title">
+        <div class="agents-hero">
+          <div>
+            <p class="eyebrow">Built-in MCP server</p>
+            <h2 id="agents-title"><span>Bring your own</span> <span class="accent">agent.</span></h2>
+            <p class="hero-description">
+              Redline speaks the Model Context Protocol, so it plugs into the agent you already use.
+              Four tools, one prompt, <span class="hl">zero cloud.</span>
+            </p>
+          </div>
+
+          <div class="config" data-tabs>
+            <div class="tabs" role="tablist" aria-label="Agent">
+              <button role="tab" aria-selected="true" data-tab="claude">Claude Code</button>
+              <button role="tab" aria-selected="false" data-tab="desktop">Claude Desktop</button>
+              <button role="tab" aria-selected="false" data-tab="codex">Codex CLI</button>
+              <button role="tab" aria-selected="false" data-tab="antigravity">Antigravity</button>
+            </div>
+            <div class="panel" data-panel="claude">
+<pre><code><span class="c"># add once, available in every project</span>
+claude mcp add --scope user redline -- \
+  node /path/to/redline/desktop-app/mcp/server.js</code></pre>
+            </div>
+            <div class="panel" data-panel="desktop" hidden>
+<pre><code><span class="c">// Settings → Developer → Edit Config</span>
+{
+  "mcpServers": {
+    "redline": {
+      "command": "node",
+      "args": ["/path/to/redline/desktop-app/mcp/server.js"]
+    }
+  }
+}</code></pre>
+            </div>
+            <div class="panel" data-panel="codex" hidden>
+<pre><code><span class="c"># or add [mcp_servers.redline] to ~/.codex/config.toml</span>
+codex mcp add redline -- \
+  node /path/to/redline/desktop-app/mcp/server.js</code></pre>
+            </div>
+            <div class="panel" data-panel="antigravity" hidden>
+<pre><code><span class="c">// Agent panel → MCP Servers → View raw config</span>
+{
+  "mcpServers": {
+    "redline": {
+      "command": "node",
+      "args": ["/path/to/redline/desktop-app/mcp/server.js"]
+    }
+  }
+}</code></pre>
+            </div>
+            <button class="copy-code" type="button">Copy</button>
+            <p class="config-note">Cursor, Windsurf, VS Code, Cline and Zed use the same <code>command</code> / <code>args</code> entry.</p>
+          </div>
+        </div>
+
+        <ul class="points">
+          <li>
+            <svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>
+            <div><b>Local &amp; private</b>Plain files on your disk. Nothing is uploaded.</div>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8M10 9h4v4h-4z"/></svg>
+            <div><b>Vision-ready</b>Annotated image, crops per mark, pixel coordinates.</div>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24"><path d="M4 6h10M4 12h16M4 18h7"/><circle cx="18" cy="6" r="2"/><circle cx="15" cy="18" r="2"/></svg>
+            <div><b>Per-mark status</b>open → in progress → review → done.</div>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg>
+            <div><b>Context capture</b>App, window title and browser URL (macOS).</div>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24"><path d="M8 9l-4 3 4 3M16 9l4 3-4 3M13.5 6l-3 12"/></svg>
+            <div><b>Open source</b>MIT licensed. Read it, fork it, ship it.</div>
+          </li>
+        </ul>
+
+        <div class="tools-table">
+          <div class="row head"><span>MCP tool</span><span>What it does</span></div>
+          <div class="row"><code>list_edit_requests</code><span>Lists requests, newest first, filtered by status.</span></div>
+          <div class="row"><code>get_edit_request</code><span>Annotated preview, a crop per open mark and a structured description.</span></div>
+          <div class="row"><code>update_edit_request_status</code><span>Sets status per mark with notes you see in the app.</span></div>
+          <div class="row"><code>delete_edit_request</code><span>Deletes a request — only when you ask.</span></div>
+          <div class="row"><code class="prompt">apply_latest</code><span>Prompt: implement every unfinished mark and report back.</span></div>
+        </div>
+      </section>
+
+      <!-- ───────── DOWNLOAD ───────── -->
+      <section class="download" id="download" aria-labelledby="download-title">
+        <div class="section-head">
+          <p class="eyebrow">Download</p>
+          <h2 id="download-title">Free. For every desktop.</h2>
+        </div>
+        <div class="platforms">
+          <article class="platform" data-os="mac">
+            <span class="index">MACOS</span>
+            <h3>Apple silicon &amp; Intel</h3>
+            <p>Menu-bar app with its own Screen Recording permission. Captures app, window and URL context.</p>
+            <ul><li><code>.dmg</code> · arm64</li><li><code>.dmg</code> · x64</li></ul>
+            <a class="btn primary" href="https://github.com/sislamrafi/redline/releases/latest" target="_blank" rel="noopener">Download for Mac</a>
+          </article>
+          <article class="platform" data-os="win">
+            <span class="index">WINDOWS</span>
+            <h3>Windows 10 &amp; 11</h3>
+            <p>Lives in the system tray. No extra permission needed for screen capture.</p>
+            <ul><li><code>.exe</code> installer · x64</li></ul>
+            <a class="btn primary" href="https://github.com/sislamrafi/redline/releases/latest" target="_blank" rel="noopener">Download for Windows</a>
+          </article>
+          <article class="platform" data-os="linux">
+            <span class="index">LINUX</span>
+            <h3>X11 &amp; Wayland</h3>
+            <p>Tray app for X11; on Wayland, capture goes through the desktop portal.</p>
+            <ul><li><code>.AppImage</code> · x64</li><li><code>.deb</code> · amd64</li></ul>
+            <a class="btn primary" href="https://github.com/sislamrafi/redline/releases/latest" target="_blank" rel="noopener">Download for Linux</a>
+          </article>
+        </div>
+        <div class="source">
+          <span class="index">OR RUN FROM SOURCE</span>
+<pre><code>git clone https://github.com/sislamrafi/redline.git
+cd redline/desktop-app && npm install
+npm run app</code></pre>
+        </div>
+      </section>
+
+      <footer class="site-footer">
+        <div class="footer-brand">
+          <a class="brand" href="#top"><img src="assets/logo-dark.svg" alt="" width="34" height="34"><span>redline</span></a>
+          <p>Mark up your screen. Let your agent make the change.</p>
+        </div>
+        <nav aria-label="Footer">
+          <div>
+            <b>Product</b>
+            <a href="#how">How it works</a>
+            <a href="#agents">Agents</a>
+            <a href="#download">Download</a>
+          </div>
+          <div>
+            <b>Developers</b>
+            <a href="https://github.com/sislamrafi/redline#readme" target="_blank" rel="noopener">Docs</a>
+            <a href="https://github.com/sislamrafi/redline" target="_blank" rel="noopener">GitHub</a>
+            <a href="https://github.com/sislamrafi/redline/issues" target="_blank" rel="noopener">Issues</a>
+          </div>
+          <div>
+            <b>Project</b>
+            <a href="https://github.com/sislamrafi/redline/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>
+            <a href="https://github.com/sislamrafi/redline/releases" target="_blank" rel="noopener">Releases</a>
+          </div>
+        </nav>
+        <p class="copyright">© 2026 Redline · redlinez.org · Open source under the MIT License</p>
+      </footer>
+    </div>
+  </main>
+
+  <script src="main.js" defer></script>
+</body>
+</html>

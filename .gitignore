@@ -4,3 +4,12 @@ node_modules/
 # local MCP config with machine-specific absolute paths
 .mcp.json
 .claude/settings.local.json
+
+# local media assets (recordings, renders)
+assets-gitignore/
+
+# packaged macOS app (npm run mac:build)
+dist/
+
+# design reference material (third-party page), not part of the site
+redline-assets/

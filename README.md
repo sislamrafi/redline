@@ -80,9 +80,11 @@ You need [Node.js](https://nodejs.org) 18 or newer (developed on Node 24) and gi
 
 ```bash
 git clone https://github.com/sislamrafi/redline.git
-cd redline
+cd redline/desktop-app
 npm install
 ```
+
+All commands below run from `desktop-app/`.
 
 `npm install` also downloads Electron for your OS.
 
@@ -111,19 +113,34 @@ so you can bind them to Raycast, Alfred, AutoHotkey or your desktop's custom sho
 ### macOS
 
 ```bash
-cd ~/path/to/redline
+cd ~/path/to/redline/desktop-app
 npm run app
 ```
 
 - The first capture needs **Screen Recording** permission: open System Settings → Privacy & Security → Screen Recording and allow **Electron**, or the terminal you started Redline from. Then quit and restart Redline.
 - Reading the window title and browser URL may ask for **Accessibility** or **Automation** access. This is optional; capture works without it.
 
+#### Run it as a standalone Redline.app (recommended)
+
+With `npm run app`, macOS ties the Screen Recording permission to whatever launched it (Terminal, VS Code, Claude…).
+To give Redline its own entry in Privacy settings, build a real app bundle:
+
+```bash
+npm run mac:install   # builds dist/mac-arm64/Redline.app, copies it to /Applications and opens it
+```
+
+Then allow **Redline** under System Settings → Privacy & Security → Screen Recording and restart it.
+
+The bundle is only a thin launcher (`build/mac-loader.cjs`): it loads `app/main.js` from this checkout,
+so **code edits take effect the next time you quit and reopen Redline**, with no rebuild needed and the permission kept.
+Rebuild only after moving the repo or upgrading Electron. You can point it at another checkout with `REDLINE_SRC=/path/to/redline/desktop-app`.
+
 ### Windows
 
 In PowerShell or Command Prompt:
 
 ```powershell
-cd C:\path\to\redline
+cd C:\path\to\redline\desktop-app
 npm run app
 ```
 
@@ -139,7 +156,7 @@ npm run app
 ### Linux
 
 ```bash
-cd ~/path/to/redline
+cd ~/path/to/redline/desktop-app
 npm run app
 ```
 
@@ -149,8 +166,8 @@ npm run app
 
 ## Start automatically at login
 
-To have Redline always ready, start it when you log in. In each example, replace `/path/to/redline` with
-the folder you cloned into.
+To have Redline always ready, start it when you log in. In each example, replace `/path/to/redline/desktop-app` with
+the `desktop-app` folder inside the repo you cloned.
 
 ### macOS: Launch Agent
 
@@ -164,8 +181,8 @@ Create `~/Library/LaunchAgents/com.redline.app.plist`:
   <key>Label</key><string>com.redline.app</string>
   <key>ProgramArguments</key>
   <array>
-    <string>/path/to/redline/node_modules/.bin/electron</string>
-    <string>/path/to/redline</string>
+    <string>/path/to/redline/desktop-app/node_modules/.bin/electron</string>
+    <string>/path/to/redline/desktop-app</string>
   </array>
   <key>RunAtLoad</key><true/>
   <key>KeepAlive</key><false/>
@@ -186,7 +203,7 @@ To stop it starting at login: `launchctl unload ~/Library/LaunchAgents/com.redli
 
    ```vbscript
    Set sh = CreateObject("WScript.Shell")
-   sh.CurrentDirectory = "C:\path\to\redline"
+   sh.CurrentDirectory = "C:\path\to\redline\desktop-app"
    sh.Run "cmd /c npm run app", 0, False
    ```
 
@@ -201,7 +218,7 @@ Create `~/.config/autostart/redline.desktop`:
 Type=Application
 Name=Redline
 Comment=Mark up your screen for AI agents
-Exec=/path/to/redline/node_modules/.bin/electron /path/to/redline
+Exec=/path/to/redline/desktop-app/node_modules/.bin/electron /path/to/redline/desktop-app
 X-GNOME-Autostart-enabled=true
 ```
 
@@ -209,14 +226,18 @@ Add `--no-sandbox` to the end of the `Exec` line if you needed it above. To stop
 
 ## Connect the MCP server
 
-The MCP server is `mcp/server.js`. It talks over **stdio** and reads the same `~/.redline` folder as the app.
+**Easiest:** the first time Redline starts, it opens a setup guide (later: tray menu → *Connect an agent…*, or **Connect agent** in History).
+Pick your agent (Claude Code, Cursor, Codex, Windsurf, Antigravity, Claude Desktop, VS Code, ChatGPT…), copy the command-line
+command or the prompt into your agent, and the guide shows ✓ as soon as the agent connects. The steps below do the same by hand.
+
+The MCP server is `desktop-app/mcp/server.js`. It talks over **stdio** and reads the same `~/.redline` folder as the app.
 Every client below needs the **absolute path** to that file:
 
 | OS | Example path |
 | --- | --- |
-| macOS | `/Users/you/redline/mcp/server.js` |
-| Linux | `/home/you/redline/mcp/server.js` |
-| Windows | `C:/Users/you/redline/mcp/server.js` (forward slashes, or `\\` in JSON) |
+| macOS | `/Users/you/redline/desktop-app/mcp/server.js` |
+| Linux | `/home/you/redline/desktop-app/mcp/server.js` |
+| Windows | `C:/Users/you/redline/desktop-app/mcp/server.js` (forward slashes, or `\\` in JSON) |
 
 > The desktop app doesn't need to be running for the MCP server to work. It only has to be running
 > when you want to capture new markups.
@@ -226,7 +247,7 @@ Every client below needs the **absolute path** to that file:
 Available in every project (recommended):
 
 ```bash
-claude mcp add --scope user redline -- node /absolute/path/to/redline/mcp/server.js
+claude mcp add --scope user redline -- node /absolute/path/to/redline/desktop-app/mcp/server.js
 ```
 
 Check that it connected:
@@ -238,6 +259,28 @@ claude mcp list
 To add it to one project only, run the command inside that project with `--scope project` instead.
 This writes a `.mcp.json` file that you can commit. In the Claude desktop app's Code tab, the servers you
 add with `claude mcp add` are picked up automatically.
+
+#### The `/redline` command (recommended)
+
+Install a short slash command so you don't have to remember the MCP prompt names:
+
+```bash
+cd desktop-app && npm run claude:command   # copies claude/commands/redline.md to ~/.claude/commands/
+```
+
+Then in Claude Code:
+
+| Type | What it does |
+| --- | --- |
+| `/redline` | Apply your latest markup and report back per mark |
+| `/redline all` | Apply every open request |
+| `/redline list` | Show all requests and their status |
+| `/redline check` | Summarize what's waiting for your confirmation |
+| `/redline <id>` | Apply one specific request |
+| `/redline only mark 2, use Tailwind` | Apply the latest with extra instructions |
+
+The server also tells the agent what Redline is, so plain phrases like "apply my latest redline" or "fix my markup" work too.
+The MCP prompts are available as `/mcp__redline__apply`, `/mcp__redline__list` and `/mcp__redline__check`.
 
 ### Claude Desktop (chat)
 
@@ -253,7 +296,7 @@ Open **Settings → Developer → Edit Config**, or edit the file directly:
   "mcpServers": {
     "redline": {
       "command": "node",
-      "args": ["/absolute/path/to/redline/mcp/server.js"]
+      "args": ["/absolute/path/to/redline/desktop-app/mcp/server.js"]
     }
   }
 }
@@ -273,7 +316,7 @@ Claude does, so you run a small bridge that serves Redline over HTTP and expose 
 1. **Serve Redline over HTTP** with [supergateway](https://github.com/supercorp-ai/supergateway):
 
    ```bash
-   npx -y supergateway --stdio "node /absolute/path/to/redline/mcp/server.js" \
+   npx -y supergateway --stdio "node /absolute/path/to/redline/desktop-app/mcp/server.js" \
      --outputTransport streamableHttp --port 8787
    ```
 
@@ -307,13 +350,13 @@ Codex CLI runs locally and supports stdio servers directly. Add this to `~/.code
 ```toml
 [mcp_servers.redline]
 command = "node"
-args = ["/absolute/path/to/redline/mcp/server.js"]
+args = ["/absolute/path/to/redline/desktop-app/mcp/server.js"]
 ```
 
 Or from the terminal:
 
 ```bash
-codex mcp add redline -- node /absolute/path/to/redline/mcp/server.js
+codex mcp add redline -- node /absolute/path/to/redline/desktop-app/mcp/server.js
 ```
 
 ### Google Antigravity
@@ -328,7 +371,7 @@ codex mcp add redline -- node /absolute/path/to/redline/mcp/server.js
      "mcpServers": {
        "redline": {
          "command": "node",
-         "args": ["/absolute/path/to/redline/mcp/server.js"]
+         "args": ["/absolute/path/to/redline/desktop-app/mcp/server.js"]
        }
      }
    }
@@ -341,7 +384,7 @@ To add Redline to one workspace only, put the same JSON in `.agents/mcp_config.j
 ### Other MCP clients
 
 Cursor, Windsurf, VS Code (Copilot), Cline, Zed and others use the same `command` / `args` entry.
-Look for "MCP servers" in their settings and point it at `node /absolute/path/to/redline/mcp/server.js`.
+Look for "MCP servers" in their settings and point it at `node /absolute/path/to/redline/desktop-app/mcp/server.js`.
 
 ## Using it
 
@@ -352,7 +395,7 @@ This walkthrough follows one real request: making a heading on a web page a litt
 Your agent can only see your markups after the Redline MCP is added. Do this once, before your first request:
 
 ```bash
-claude mcp add --scope user redline -- node /absolute/path/to/redline/mcp/server.js
+claude mcp add --scope user redline -- node /absolute/path/to/redline/desktop-app/mcp/server.js
 ```
 
 ```bash
@@ -400,7 +443,7 @@ Open Claude in the project that contains that UI (here, the website's code) and 
 
 > read the Redline comments and fix the things mentioned there
 
-You can also say *"apply my latest Redline"*, or, in Claude Code, run `/mcp__redline__apply_latest`.
+In Claude Code just type `/redline` (see [the `/redline` command](#the-redline-command-recommended)), or say *"apply my latest Redline"*.
 
 ![Asking Claude in the Code tab: "read the redline comments and fix the things mentioned there"](docs/images/3-ask-claude.png)
 
@@ -428,7 +471,9 @@ Claude picks it up again.
 
 | Prompt | What it does |
 | --- | --- |
-| `apply_latest` | Fetches the latest request, implements each unfinished mark in the current codebase and reports per mark. |
+| `apply` | Fetches the latest request, implements each unfinished mark in the current codebase and reports per mark (`apply_latest` still works). |
+| `list` | Lists every request with its status. |
+| `check` | Summarizes what's waiting for your confirmation. |
 
 Agents set finished marks to **`review`**, not `done`. You confirm them in the app.
 If you edit or move a mark, it goes back to `open`, so the next agent picks it up again.
@@ -463,15 +508,19 @@ An existing `~/.annotation-mcp` folder from older versions is moved to `~/.redli
 ## Project structure
 
 ```
-app/
-  main.js          Electron tray app: hotkeys, screen capture, windows, IPC
-  preload.cjs      bridge between the renderer and main process
-  renderer/        markup editor and history UI (HTML/CSS/JS)
-mcp/server.js      MCP server (stdio)
-shared/store.js    on-disk store and status logic, shared by the app and the server
-scripts/
-  mcp-smoke.js     end-to-end smoke test against the MCP server
-  mcp-call.js      call one MCP tool from the CLI: node scripts/mcp-call.js <tool> '<json>' [outDir]
+desktop-app/           the installable Redline app + MCP server (run npm commands here)
+  app/
+    main.js            Electron tray app: hotkeys, screen capture, windows, IPC
+    preload.cjs        bridge between the renderer and main process
+    renderer/          markup editor and history UI (HTML/CSS/JS)
+  mcp/server.js        MCP server (stdio)
+  shared/store.js      on-disk store and status logic, shared by the app and the server
+  scripts/
+    mcp-smoke.js       end-to-end smoke test against the MCP server
+    mcp-call.js        call one MCP tool from the CLI: node scripts/mcp-call.js <tool> '<json>' [outDir]
+  build/               icons, electron-builder hooks, local macOS launcher
+portfolio-website/     the redlinez.org landing page (static HTML/CSS/JS, no build step)
+docs/images/           screenshots used in this README
 ```
 
 ## Development
@@ -485,6 +534,32 @@ The smoke test changes the status of your latest request to `done`. Point `REDLI
 folder if you don't want that.
 
 Issues and pull requests are welcome.
+
+### Building installers and releases
+
+Release builds bundle the app code (unlike the local `npm run mac:install` launcher) and are configured in the
+`build` section of `package.json`:
+
+```bash
+npm run dist:mac     # dist/Redline-<version>-mac-arm64.dmg and -mac-x64.dmg
+npm run dist:win     # dist/Redline-<version>-win-x64.exe (NSIS installer); build on Windows
+npm run dist:linux   # dist/Redline-<version>-linux-x86_64.AppImage and -linux-amd64.deb; build on Linux
+```
+
+To publish a GitHub Release, bump the version and push the tag. The [Release workflow](.github/workflows/release.yml)
+builds on macOS, Windows and Linux and attaches every installer to a **draft** release. Review it on GitHub, then click *Publish release*.
+
+```bash
+npm version 0.2.0 && git push --follow-tags
+```
+
+The builds are not signed with an Apple Developer ID or a Windows code-signing certificate, so first launch shows a warning:
+
+- **macOS:** "Redline can't be opened / is damaged". Open it once from System Settings → Privacy & Security → *Open Anyway*,
+  or run `xattr -dr com.apple.quarantine /Applications/Redline.app`.
+- **Windows:** SmartScreen "Windows protected your PC". Click *More info → Run anyway*.
+
+The installers contain the desktop capture app only. The MCP server is still run from a checkout (see [Connect the MCP server](#connect-the-mcp-server)).
 
 ## License
 

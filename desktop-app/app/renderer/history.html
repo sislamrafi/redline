@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'">
+  <title>Redline — History</title>
+  <link rel="stylesheet" href="history.css">
+</head>
+<body>
+  <header class="titlebar">
+    <div class="brand">
+      <img src="../assets/logo-dark.svg" alt="" width="26" height="26">
+      <b>Redline</b><span>History</span>
+    </div>
+    <div class="search">
+      <svg viewBox="0 0 20 20"><circle cx="9" cy="9" r="6"/><path d="M14 14l4 4"/></svg>
+      <input id="search" type="search" placeholder="Search requests" spellcheck="false">
+      <kbd>⌘F</kbd>
+    </div>
+    <button id="open-setup" class="btn" title="Connect an agent (setup)">
+      <svg viewBox="0 0 20 20"><path d="M7 3v4M13 3v4M5 7h10v3a5 5 0 0 1-10 0zM10 15v3"/></svg>Connect agent
+    </button>
+    <button id="capture" class="btn primary" title="Mark up the screen">
+      <svg viewBox="0 0 20 20"><rect x="2.5" y="4" width="15" height="11" rx="2"/><path d="M7 18h6"/><path d="M11 6.5c3-1 5 0 4.5 2-.5 2-4 2.5-5 1"/></svg>
+      Mark up screen <kbd>⌥⇧M</kbd>
+    </button>
+  </header>
+
+  <div class="layout">
+    <aside class="side">
+      <nav class="tabs" role="tablist">
+        <button data-tab="active" class="on" title="1">To do <i></i></button>
+        <button data-tab="review" title="2">Confirm <i></i></button>
+        <button data-tab="done" title="3">Done <i></i></button>
+        <button data-tab="all" title="4">All <i></i></button>
+      </nav>
+      <div id="list" class="list" tabindex="0" aria-label="Requests"></div>
+      <section id="cmdbar" class="cmdbar" aria-label="Commands for your agent"></section>
+      <footer class="side-foot">
+        <button id="cmd-toggle" class="cmd-toggle" hidden title="Show the command bar">⌘ Commands</button>
+        <span><kbd>↑</kbd><kbd>↓</kbd> move</span>
+        <span><kbd>D</kbd> done</span>
+        <span><kbd>R</kbd> reopen</span>
+        <span><kbd>⌫</kbd> delete</span>
+        <span><kbd>↵</kbd> edit</span>
+      </footer>
+    </aside>
+
+    <main id="detail" class="detail">
+      <div class="empty-detail">
+        <img src="../assets/logo-dark.svg" alt="" width="72" height="72">
+        <p>No request selected.</p>
+        <p class="dim">Press <kbd>⌥⇧M</kbd> anywhere to mark up your screen, then ask your agent to <i>apply my latest Redline</i>.</p>
+      </div>
+    </main>
+  </div>
+
+  <div id="setup" class="setup" hidden><div class="setup-box" role="dialog" aria-label="Redline setup"></div></div>
+  <div id="menu" class="menu" hidden></div>
+  <div id="toast" class="toast" hidden><span class="msg"></span><button class="undo" hidden>Undo</button></div>
+
+  <script src="history.js"></script>
+  <script src="setup.js"></script>
+</body>
+</html>

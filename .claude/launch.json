@@ -1,6 +1,29 @@
 {
   "version": "0.0.1",
   "configurations": [
-    { "name": "editor-demo", "runtimeExecutable": "python3", "runtimeArgs": ["-m", "http.server", "5178", "-d", "app/renderer"], "port": 5178 }
+    {
+      "name": "editor-demo",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "5178",
+        "-d",
+        "desktop-app/app"
+      ],
+      "port": 5178
+    },
+    {
+      "name": "website",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "5179",
+        "-d",
+        "portfolio-website"
+      ],
+      "port": 5179
+    }
   ]
 }
