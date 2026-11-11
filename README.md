@@ -547,10 +547,12 @@ npm run dist:linux   # dist/Redline-<version>-linux-x86_64.AppImage and -linux-a
 ```
 
 To publish a GitHub Release, bump the version and push the tag. The [Release workflow](.github/workflows/release.yml)
-builds on macOS, Windows and Linux and attaches every installer to a **draft** release. Review it on GitHub, then click *Publish release*.
+builds on macOS, Windows and Linux and attaches every installer to one **draft** release. Review it on GitHub, then click *Publish release*.
+Tags with a suffix such as `v0.0.1-beta` are marked as pre-releases.
 
 ```bash
-npm version 0.2.0 && git push --follow-tags
+cd desktop-app && npm version 0.2.0 --no-git-tag-version && cd ..
+git commit -am "Release v0.2.0" && git tag v0.2.0 && git push && git push origin v0.2.0
 ```
 
 The builds are not signed with an Apple Developer ID or a Windows code-signing certificate, so first launch shows a warning:

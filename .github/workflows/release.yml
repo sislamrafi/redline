@@ -1,8 +1,13 @@
 name: Release
 
-# Push a version tag (matching package.json "version") to build installers for every OS
-# and attach them to a DRAFT GitHub Release. Review the draft, then click "Publish release".
-#   npm version 0.2.0 && git push --follow-tags
+# Push a version tag (matching desktop-app/package.json "version") to build installers for every OS
+# and attach them all to ONE draft GitHub Release. Review the draft, then click "Publish release".
+#   cd desktop-app && npm version 0.2.0 --no-git-tag-version
+#   git commit -am "Release v0.2.0" && git tag v0.2.0 && git push && git push origin v0.2.0
+# Tags with a suffix (v0.0.1-beta, v1.0.0-rc.1) are marked as pre-releases.
+#
+# The build jobs only build; a single release job publishes. Letting every OS job publish
+# races to create the same release and leaves the files split across duplicate drafts.
 on:
   push:
     tags: ['v*']
@@ -28,17 +33,16 @@ jobs:
       run:
         working-directory: desktop-app
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
           cache-dependency-path: desktop-app/package-lock.json
       - run: npm ci
-      - name: Build and upload to draft release
-        run: npx electron-builder ${{ matrix.target }} --publish ${{ startsWith(github.ref, 'refs/tags/') && 'always' || 'never' }}
+      - name: Build installers
+        run: npx electron-builder ${{ matrix.target }} --publish never
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
       - uses: actions/upload-artifact@v4
         with:
@@ -49,3 +53,22 @@ jobs:
             desktop-app/dist/*.AppImage
             desktop-app/dist/*.deb
           if-no-files-found: error
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: installers
+          merge-multiple: true
+      - run: ls -lh installers
+      - uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          prerelease: ${{ contains(github.ref_name, '-') }}
+          name: Redline ${{ github.ref_name }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: installers/*
